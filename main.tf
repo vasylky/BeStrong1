@@ -15,7 +15,7 @@ provider "azurerm" {
 
 data "azurerm_client_config" "current" {}
 
-# 1. Virtual Network & Subnet for integration
+
 resource "azurerm_virtual_network" "vnet" {
   name                = "bestrong-vnet"
   address_space       = ["10.0.0.0/16"]
@@ -29,7 +29,7 @@ resource "azurerm_subnet" "integration_subnet" {
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  # Додаємо Service Endpoint для Key Vault
+  
   service_endpoints = ["Microsoft.KeyVault"]
 
   delegation {
@@ -42,7 +42,7 @@ resource "azurerm_subnet" "integration_subnet" {
 }
 
 
-# 2. Key Vault
+
 resource "azurerm_key_vault" "kv" {
   name                        = "bestrong-keyvault"
   location                    = "eastus"
@@ -58,7 +58,7 @@ resource "azurerm_key_vault" "kv" {
   }
 }
 
-# 3. App Service Plan
+
 resource "azurerm_service_plan" "service_plan" {
   name                = "bestrong-plan"
   location            = "eastus"
@@ -67,7 +67,7 @@ resource "azurerm_service_plan" "service_plan" {
   sku_name            = "S1"
 }
 
-# 4. Web App with Managed Identity
+
 resource "azurerm_windows_web_app" "app" {
   name                = "bestrong-app"
   location            = "eastus"
@@ -90,20 +90,17 @@ resource "azurerm_windows_web_app" "app" {
   }
 }
 
-# # 5. Assign Key Vault Access to Web App
 # resource "azurerm_role_assignment" "kv_access" {
 #   scope                = azurerm_key_vault.kv.id
 #   role_definition_name = "Key Vault Secrets User"
 #   principal_id         = azurerm_windows_web_app.app.identity[0].principal_id
 # }
 
-# 6. Enable VNet Integration for App Service
 resource "azurerm_app_service_virtual_network_swift_connection" "vnet_integration" {
   app_service_id = azurerm_windows_web_app.app.id
   subnet_id      = azurerm_subnet.integration_subnet.id
 }
 
-# 7. Application Insights
 resource "azurerm_application_insights" "insights" {
   name                = "bestrong-insights"
   location            = "eastus"
@@ -112,7 +109,6 @@ resource "azurerm_application_insights" "insights" {
   retention_in_days   = 90
 }
 
-# 8. Azure Container Registry (ACR)
 resource "azurerm_container_registry" "acr" {
   name                = "bestrongacr"
   resource_group_name = var.resource_group_name
@@ -121,7 +117,6 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled       = false
 }
 
-# 9. Outputs
 output "managed_identity_principal_id" {
   value       = azurerm_windows_web_app.app.identity[0].principal_id
   description = "The Principal ID of the System Assigned Managed Identity"
