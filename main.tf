@@ -10,7 +10,7 @@ terraform{
 provider "azurerm" {
   features {}
   skip_provider_registration = true
-  subscription_id            = "9734ed68-621d-47ed-babd-269110dbacb1"
+  subscription_id            = var.subscription_id
 }
 
 # Resource Group is already defined in your environment
@@ -21,12 +21,12 @@ resource "azurerm_virtual_network" "vnet" {
   name                = "bestrong-vnet"
   address_space       = ["10.0.0.0/16"]
   location            = "eastus"
-  resource_group_name = "1-4a99e6fb-playground-sandbox"
+  resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_subnet" "integration_subnet" {
   name                 = "integration-subnet"
-  resource_group_name  = "1-4a99e6fb-playground-sandbox"
+  resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
 
@@ -45,7 +45,7 @@ resource "azurerm_subnet" "integration_subnet" {
 resource "azurerm_service_plan" "service_plan" {
   name                = "bestrong-plan"
   location            = "eastus"
-  resource_group_name = "1-4a99e6fb-playground-sandbox"
+  resource_group_name = var.resource_group_name
   os_type             = "Windows" # Or "Linux" depending on your needs
   sku_name            = "S1"      # Standard tier as specified in your original code
 }
@@ -54,7 +54,7 @@ resource "azurerm_service_plan" "service_plan" {
 resource "azurerm_windows_web_app" "app" { # Use azurerm_linux_web_app for Linux
   name                = "bestrong-app"
   location            = "eastus"
-  resource_group_name = "1-4a99e6fb-playground-sandbox"
+  resource_group_name = var.resource_group_name
   service_plan_id     = azurerm_service_plan.service_plan.id
 
   # Enable system-assigned managed identity
@@ -80,7 +80,7 @@ resource "azurerm_app_service_virtual_network_swift_connection" "vnet_integratio
 resource "azurerm_application_insights" "insights" {
   name                = "bestrong-insights"
   location            = "eastus"
-  resource_group_name = "1-4a99e6fb-playground-sandbox"
+  resource_group_name = var.resource_group_name
   application_type    = "web"
   workspace_id        = null # Set to a Log Analytics workspace ID if you have one
   retention_in_days   = 90
@@ -88,7 +88,7 @@ resource "azurerm_application_insights" "insights" {
 
 resource "azurerm_container_registry" "acr" {
   name                = "bestrongacr"
-  resource_group_name = "1-4a99e6fb-playground-sandbox"
+  resource_group_name = var.resource_group_name
   location            = "eastus"
   sku                 = "Basic"
   admin_enabled       = false
