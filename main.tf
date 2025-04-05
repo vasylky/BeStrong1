@@ -15,7 +15,6 @@ provider "azurerm" {
 
 data "azurerm_client_config" "current" {}
 
-
 resource "azurerm_virtual_network" "vnet" {
   name                = "bestrong-vnet"
   address_space       = ["10.0.0.0/16"]
@@ -28,12 +27,11 @@ resource "azurerm_subnet" "integration_subnet" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
-
-  
-  service_endpoints = ["Microsoft.KeyVault"]
+  service_endpoints    = ["Microsoft.KeyVault"]
 
   delegation {
     name = "app-service-delegation"
+
     service_delegation {
       name    = "Microsoft.Web/serverFarms"
       actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
@@ -41,10 +39,8 @@ resource "azurerm_subnet" "integration_subnet" {
   }
 }
 
-
-
-resource "azurerm_key_vault" "kv" {
-  name                        = "bestrong-keyvault"
+resource "azurerm_key_vault" "kv123" {
+  name                        = "bestrong-keyvault121"
   location                    = "eastus"
   resource_group_name         = var.resource_group_name
   sku_name                    = "standard"
@@ -52,12 +48,11 @@ resource "azurerm_key_vault" "kv" {
   enable_rbac_authorization   = false
 
   network_acls {
-    default_action = "Deny"
-    bypass         = "AzureServices"
-    virtual_network_subnet_ids = [azurerm_subnet.integration_subnet.id]
+    default_action              = "Deny"
+    bypass                      = "AzureServices"
+    virtual_network_subnet_ids  = [azurerm_subnet.integration_subnet.id]
   }
 }
-
 
 resource "azurerm_service_plan" "service_plan" {
   name                = "bestrong-plan"
@@ -67,6 +62,13 @@ resource "azurerm_service_plan" "service_plan" {
   sku_name            = "S1"
 }
 
+resource "azurerm_application_insights" "insights" {
+  name                = "bestrong-insights"
+  location            = "eastus"
+  resource_group_name = var.resource_group_name
+  application_type    = "web"
+  retention_in_days   = 90
+}
 
 resource "azurerm_windows_web_app" "app" {
   name                = "bestrong-app"
@@ -86,27 +88,16 @@ resource "azurerm_windows_web_app" "app" {
   }
 
   app_settings = {
-    "KEY_VAULT_URL" = azurerm_key_vault.kv.vault_uri
+    "KEY_VAULT_URL"           = azurerm_key_vault.kv123.vault_uri
+    "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.insights.instrumentation_key
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.insights.connection_string
+    "ApplicationInsightsAgent_EXTENSION_VERSION" = "~2"
   }
 }
-
-# resource "azurerm_role_assignment" "kv_access" {
-#   scope                = azurerm_key_vault.kv.id
-#   role_definition_name = "Key Vault Secrets User"
-#   principal_id         = azurerm_windows_web_app.app.identity[0].principal_id
-# }
 
 resource "azurerm_app_service_virtual_network_swift_connection" "vnet_integration" {
   app_service_id = azurerm_windows_web_app.app.id
   subnet_id      = azurerm_subnet.integration_subnet.id
-}
-
-resource "azurerm_application_insights" "insights" {
-  name                = "bestrong-insights"
-  location            = "eastus"
-  resource_group_name = var.resource_group_name
-  application_type    = "web"
-  retention_in_days   = 90
 }
 
 resource "azurerm_container_registry" "acr" {
