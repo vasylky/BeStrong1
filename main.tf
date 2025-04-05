@@ -1,11 +1,8 @@
 terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.0"
-    }
-  }
+  backend "azurerm" {}
 }
+
+
 
 provider "azurerm" {
   features {}
@@ -40,17 +37,17 @@ resource "azurerm_subnet" "integration_subnet" {
 }
 
 resource "azurerm_key_vault" "kv123" {
-  name                        = "bestrong-keyvault121"
-  location                    = "eastus"
-  resource_group_name         = var.resource_group_name
-  sku_name                    = "standard"
-  tenant_id                   = data.azurerm_client_config.current.tenant_id
-  enable_rbac_authorization   = false
+  name                      = "bestrong-keyvault121"
+  location                  = "eastus"
+  resource_group_name       = var.resource_group_name
+  sku_name                  = "standard"
+  tenant_id                 = data.azurerm_client_config.current.tenant_id
+  enable_rbac_authorization = false
 
   network_acls {
-    default_action              = "Deny"
-    bypass                      = "AzureServices"
-    virtual_network_subnet_ids  = [azurerm_subnet.integration_subnet.id]
+    default_action             = "Deny"
+    bypass                     = "AzureServices"
+    virtual_network_subnet_ids = [azurerm_subnet.integration_subnet.id]
   }
 }
 
@@ -88,9 +85,9 @@ resource "azurerm_windows_web_app" "app" {
   }
 
   app_settings = {
-    "KEY_VAULT_URL"           = azurerm_key_vault.kv123.vault_uri
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.insights.instrumentation_key
-    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.insights.connection_string
+    "KEY_VAULT_URL"                              = azurerm_key_vault.kv123.vault_uri
+    "APPINSIGHTS_INSTRUMENTATIONKEY"             = azurerm_application_insights.insights.instrumentation_key
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"      = azurerm_application_insights.insights.connection_string
     "ApplicationInsightsAgent_EXTENSION_VERSION" = "~2"
   }
 }
@@ -106,6 +103,29 @@ resource "azurerm_container_registry" "acr" {
   location            = "eastus"
   sku                 = "Basic"
   admin_enabled       = false
+}
+
+resource "azurerm_storage_account" "tfstate" {
+  name                     = var.storage_account_name
+  resource_group_name      = var.resource_group_name
+  location                 = "eastus"
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+
+  min_tls_version = "TLS1_2"
+}
+
+resource "azurerm_storage_container" "tfstate" {
+  name                  = var.container_name
+  storage_account_name  = azurerm_storage_account.tfstate.name
+  container_access_type = "private"
+}
+
+resource "azurerm_management_lock" "tfstate_lock" {
+  name       = "lock-tfstate-storage"
+  scope      = azurerm_storage_account.tfstate.id
+  lock_level = "CanNotDelete"
+  notes      = "Lock for Terraform state storage account"
 }
 
 output "managed_identity_principal_id" {
