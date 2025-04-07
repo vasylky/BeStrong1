@@ -1,6 +1,6 @@
-terraform {
-  backend "azurerm" {}
-}
+ terraform {
+   backend "azurerm" {}
+ }
 
 
 
@@ -20,7 +20,7 @@ resource "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_subnet" "integration_subnet" {
-  name                 = "${var.environment}bestrong_plan"
+  name                 = "${var.environment}-bestrong-plan"  # Fixed: Added hyphen between environment and name
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = var.subnet_address_prefix
@@ -35,6 +35,7 @@ resource "azurerm_subnet" "integration_subnet" {
     }
   }
 }
+
 resource "azurerm_subnet" "private_endpoints_subnet" {
   name                 = "${var.environment}-bestrong-pe-subnet"
   resource_group_name  = var.resource_group_name
@@ -44,7 +45,7 @@ resource "azurerm_subnet" "private_endpoints_subnet" {
 }
 
 resource "azurerm_key_vault" "keyvc114414100320251923458" {
-  name                      = "${var.environment}-keyvault4544"
+  name                      = "${var.environment}-keyvault45234"
   location                  = var.location
   resource_group_name       = var.resource_group_name
   sku_name                  = var.key_vault_sku
@@ -58,6 +59,13 @@ resource "azurerm_key_vault" "keyvc114414100320251923458" {
   }
 }
 
+resource "azurerm_role_assignment" "app_service_key_vault_access" {
+  principal_id   = azurerm_windows_web_app.app.identity[0].principal_id
+  role_definition_name = "Key Vault Secrets User"  # Роль для доступу до секретів
+  scope           = azurerm_key_vault.keyvc114414100320251923458.id
+}
+
+
 resource "azurerm_service_plan" "service_plan" {
   name                = "${var.environment}-bestrong-plan"
   location            = var.location
@@ -66,16 +74,17 @@ resource "azurerm_service_plan" "service_plan" {
   sku_name            = var.app_service_sku
 }
 
-resource "azurerm_application_insights" "insights" {
-  name                = "${var.environment}-bestrong-insights"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  application_type    = "web"
-  retention_in_days   = var.app_insights_retention
-}
+# resource "azurerm_application_insights" "insights" {
+#   name                = "${var.environment}-bestrong-insights111"
+#   location            = var.location
+#   resource_group_name = var.resource_group_name
+#   application_type    = "web"
+#   retention_in_days   = var.app_insights_retention
+
+# }
 
 resource "azurerm_windows_web_app" "app" {
-  name                = "${var.environment}-bestrong-app"
+  name                = "${var.environment}-bestrong-app1"
   location            = var.location
   resource_group_name = var.resource_group_name
   service_plan_id     = azurerm_service_plan.service_plan.id
@@ -93,9 +102,9 @@ resource "azurerm_windows_web_app" "app" {
 
   app_settings = {
     "KEY_VAULT_URL"                              = azurerm_key_vault.keyvc114414100320251923458.vault_uri
-    "APPINSIGHTS_INSTRUMENTATIONKEY"             = azurerm_application_insights.insights.instrumentation_key
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"      = azurerm_application_insights.insights.connection_string
-    "ApplicationInsightsAgent_EXTENSION_VERSION" = "~2"
+    # "APPINSIGHTS_INSTRUMENTATIONKEY"             = azurerm_application_insights.insights.instrumentation_key
+    # "APPLICATIONINSIGHTS_CONNECTION_STRING"      = azurerm_application_insights.insights.connection_string
+    # "ApplicationInsightsAgent_EXTENSION_VERSION" = "~2"
   }
 }
 
@@ -105,12 +114,19 @@ resource "azurerm_app_service_virtual_network_swift_connection" "vnet_integratio
 }
 
 resource "azurerm_container_registry" "acr" {
-  name                = "${var.environment}bestrongacr"
+  name                = "${var.environment}bestrongacr1"
   resource_group_name = var.resource_group_name
   location            = var.location
   sku                 = "Basic"
   admin_enabled       = false
 }
+
+resource "azurerm_role_assignment" "acr_pull" {
+  scope                = azurerm_container_registry.acr.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_windows_web_app.app.identity[0].principal_id
+}
+
 
 resource "azurerm_storage_account" "tfstate" {
   name                     = var.storage_account_name
@@ -129,7 +145,7 @@ resource "azurerm_storage_container" "tfstate" {
 }
 
 resource "azurerm_mssql_server" "sql_server" {
-  name                         = "${var.environment}-bestrong-sqlserver"
+  name                         = "${var.environment}-bestrong-sqlserver-new"  # Fixed: Added suffix to avoid conflict
   resource_group_name          = var.resource_group_name
   location                     = var.location
   version                      = "12.0"
@@ -182,7 +198,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "sql_dns_link" {
 }
 
 resource "azurerm_storage_account" "app_storage" {
-  name                     = "${var.environment}bestrongappsa"
+  name                     = "${var.environment}bestrongappsa1"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"
@@ -235,14 +251,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "storage_dns_link" {
   private_dns_zone_name = azurerm_private_dns_zone.storage_dns.name
   virtual_network_id    = azurerm_virtual_network.vnet.id
   registration_enabled  = false
-}
-
-
-
-
-output "managed_identity_principal_id" {
-  value       = azurerm_windows_web_app.app.identity[0].principal_id
-  description = "The Principal ID of the System Assigned Managed Identity"
 }
 
 output "app_url" {
