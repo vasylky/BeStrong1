@@ -88,16 +88,16 @@ variable "environment" {
   type        = string
 }
 
-variable "sql_admin_username"{
+variable "sql_admin_username" {
   description = "sql_admin"
-  type        = string 
-  sensitive = true
+  type        = string
+  sensitive   = true
 }
 
-variable "sql_admin_password"{
+variable "sql_admin_password" {
   description = "sql_password"
-  type        = string 
-  sensitive = true
+  type        = string
+  sensitive   = true
 }
 
 variable "sql_db_sku" {
