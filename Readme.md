@@ -15,11 +15,19 @@ overview
 
 Setup
 
-1.create files for the main structure
+1.create files for the main structure and implement modularity 
     main.tf
     variables.tf
     outputs.tf
     *.tfvars
+
+        modules/
+    ├── appservice
+    ├── container_registry
+    ├── keyvvault
+    ├── network
+    ├── sql
+    └── storage
 
 2.
 Compute & Hosting
@@ -78,4 +86,23 @@ Storage
 
         Storage Account #2: Dedicated for Terraform state files
         Stores infrastructure state for Terraform deployments
+
+**3.Deploy resources to the cloud**
+
+
+        terraform **init**
+        *optional* terraform fmt and terraform validate to check syntax and dependencies
+        terraform **plan**
+        terraform **apply**
+        (tfstate is local atm)
+
+        then transfer state to remote by doing this
+
+        terrafrom init -backend-config=backend.config
+        terraform init again with backend config to initialize remote state
+
+    
+
+    ![Моє фото](./images/state1.jpg)
+
 
