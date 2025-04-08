@@ -36,11 +36,10 @@ module "appservice" {
   app_service_sku       = var.app_service_sku
   dotnet_version        = var.dotnet_version
   integration_subnet_id = module.network.integration_subnet_id
-  # No dependency on Key Vault here
   depends_on = [module.network]
 }
 
-# Key Vault module - with app service principal
+# Key Vault module 
 module "keyvault" {
   source                = "./modules/keyvault"
   environment           = var.environment
@@ -54,12 +53,9 @@ module "keyvault" {
   depends_on            = [module.appservice]
 }
 
-# Update App Service with Key Vault URL
 resource "null_resource" "update_app_keyvault" {
   provisioner "local-exec" {
     command = "echo 'Key Vault URL: ${module.keyvault.key_vault_url} should be set for App Service: ${module.appservice.app_name}'"
-    # In production, you'd use az CLI to update the app settings
-    # command = "az webapp config appsettings set --name ${module.appservice.app_name} --resource-group ${var.resource_group_name} --settings KEY_VAULT_URL=${module.keyvault.key_vault_url}"
   }
 
   depends_on = [module.appservice, module.keyvault]
