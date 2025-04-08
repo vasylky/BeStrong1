@@ -89,20 +89,74 @@ Storage
 
 **3.Deploy resources to the cloud**
 
-
-        terraform **init**
-        *optional* terraform fmt and terraform validate to check syntax and dependencies
+    
+        terraform init
+*optional* terraform fmt and terraform validate to check syntax and dependencies
         terraform **plan**
         terraform **apply**
         (tfstate is local atm)
+
+
+
+![Моє фото](./images/localstate.jpg)
 
         then transfer state to remote by doing this
 
         terrafrom init -backend-config=backend.config
         terraform init again with backend config to initialize remote state
 
-    
+![Моє фото](./images/state1.jpg)
 
-    ![Моє фото](./images/state1.jpg)
+
+        all resources 
+
+![Моє фото](./images/allres.png)
+
+        app service plan
+
+![Моє фото](./images/apspla.png)
+
+        app service integrate with vnet and system managed identity
+
+
+![Моє фото](./images/apps.png)
+![Моє фото](./images/appsyid.png)
+![Моє фото](./images/apsnw.png)
+
+
+        application insights
+
+![тут має бути інсайтс]()
+
+        azure container registry with pull access
+
+![Моє фото](./images/acr.png)
+
+        key vault with access to secrets and integrated with vnet
+
+![Моє фото](./images/kv.png)
+![Моє фото](./images/kvvne.png)
+
+        vnet with subnets
+
+![Моє фото](./images/vnet.png)
+![Моє фото](./images/vnets.png)
+
+        mssql server with db and private endpoints
+
+![Моє фото](./images/sqlserver.png)
+![Моє фото](./images/sqldb.png)
+![Моє фото](./images/sqlendp.png)
+
+        storage with private endpoint and fileshare
+
+![Моє фото](./images/stapps.png)
+
+
+
+
+
+
+
 
 
