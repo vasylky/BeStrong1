@@ -126,7 +126,7 @@ Storage
 
         application insights
 
-![тут має бути інсайтс]()
+![Моє фото](./images/insight.png)
 
         azure container registry with pull access
 

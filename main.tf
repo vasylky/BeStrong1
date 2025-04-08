@@ -1,6 +1,6 @@
- terraform {
-   backend "azurerm" {}
- }
+terraform {
+ backend "azurerm" {}
+}
 
 provider "azurerm" {
   features {}
@@ -36,7 +36,7 @@ module "appservice" {
   app_service_sku       = var.app_service_sku
   dotnet_version        = var.dotnet_version
   integration_subnet_id = module.network.integration_subnet_id
-  depends_on = [module.network]
+  depends_on            = [module.network]
 }
 
 # Key Vault module 
