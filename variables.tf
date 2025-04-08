@@ -28,11 +28,10 @@ variable "storage_account_replication" {
 variable "container_name" {
   description = "Azure Blob Container name"
   type        = string
-
 }
 
 variable "location" {
-  description = "location"
+  description = "Azure region location"
   type        = string
 }
 
@@ -77,6 +76,7 @@ variable "subnet_address_prefix" {
   type        = list(string)
   default     = ["10.0.1.0/24"]
 }
+
 variable "pe_subnet_prefix" {
   description = "Address prefix for the private endpoints subnet"
   type        = list(string)
@@ -89,13 +89,13 @@ variable "environment" {
 }
 
 variable "sql_admin_username" {
-  description = "sql_admin"
+  description = "SQL administrator username"
   type        = string
   sensitive   = true
 }
 
 variable "sql_admin_password" {
-  description = "sql_password"
+  description = "SQL administrator password"
   type        = string
   sensitive   = true
 }
