@@ -90,7 +90,7 @@ Storage
 **3.Deploy resources to the cloud**
 
     
-        terraform init
+        terraform init (wee need to comment terraform backend config to run it locally first)
 *optional* terraform fmt and terraform validate to check syntax and dependencies
         terraform **plan**
         terraform **apply**
