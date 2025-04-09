@@ -110,18 +110,20 @@ Storage
 
         all resources 
 
-![Моє фото](./images/allres.png)
+![Моє фото](./images/allres2.jpeg)
+![Моє фото](./images/allres3.jpeg)
+
 
         app service plan
 
-![Моє фото](./images/apspla.png)
+![Моє фото](./images/apspla.jpeg)
 
         app service integrate with vnet and system managed identity
 
 
-![Моє фото](./images/apps.png)
-![Моє фото](./images/appsyid.png)
-![Моє фото](./images/apsnw.png)
+![Моє фото](./images/apps.jpeg)
+![Моє фото](./images/appsyid.jpeg)
+![Моє фото](./images/apsnw.jpeg)
 
 
         application insights
@@ -130,27 +132,32 @@ Storage
 
         azure container registry with pull access
 
-![Моє фото](./images/acr.png)
+![Моє фото](./images/acr.jpeg)
 
         key vault with access to secrets and integrated with vnet
 
-![Моє фото](./images/kv.png)
-![Моє фото](./images/kvvne.png)
+![Моє фото](./images/kv.jpeg)
+![Моє фото](./images/kvvne.jpeg)
 
         vnet with subnets
 
-![Моє фото](./images/vnet.png)
-![Моє фото](./images/vnets.png)
+![Моє фото](./images/vnet.jpeg)
+![Моє фото](./images/vnets.jpeg)
 
         mssql server with db and private endpoints
 
-![Моє фото](./images/sqlserver.png)
-![Моє фото](./images/sqldb.png)
-![Моє фото](./images/sqlendp.png)
+![Моє фото](./images/sqlserver.jpeg)
+![Моє фото](./images/sqldb.jpeg)
+![Моє фото](./images/sqlendp.jpeg)
 
         storage with private endpoint and fileshare
 
-![Моє фото](./images/stapps.png)
+
+![Моє фото](./images/stapps.jpeg)
+![Моє фото](./images/appsend.jpeg)
+
+
+
 
 
 

@@ -36,6 +36,15 @@ resource "azurerm_windows_web_app" "app" {
     "ApplicationInsightsAgent_EXTENSION_VERSION" = "~3"
   }
 
+  storage_account {
+    name         = "appfiles"
+    type         = "AzureFiles"
+    account_name = var.storage_account_name
+    share_name   = var.storage_share_name
+    access_key   = var.storage_account_key
+    mount_path   = "\\mounts\\appfiles"
+  }
+
 }
 
 resource "azurerm_app_service_virtual_network_swift_connection" "vnet_integration" {

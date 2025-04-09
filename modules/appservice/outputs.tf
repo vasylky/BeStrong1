@@ -17,3 +17,9 @@ output "app_url" {
   description = "Default URL of the App Service"
   value       = "https://${azurerm_windows_web_app.app.default_hostname}"
 }
+
+
+
+output "app_default_hostname" {
+  value = azurerm_windows_web_app.app.default_hostname
+}

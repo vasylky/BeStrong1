@@ -12,6 +12,11 @@ resource "random_id" "suffix" {
   byte_length = 4
 }
 
+resource "azurerm_resource_group" "name" {
+  name     = var.resource_group_name
+  location = var.location
+}
+
 data "azurerm_client_config" "current" {}
 
 # Network module
@@ -26,7 +31,7 @@ module "network" {
   pe_subnet_prefix      = var.pe_subnet_prefix
 }
 
-# App Service module - without key vault dependency
+# App Service module 
 module "appservice" {
   source                = "./modules/appservice"
   environment           = var.environment
@@ -36,7 +41,11 @@ module "appservice" {
   app_service_sku       = var.app_service_sku
   dotnet_version        = var.dotnet_version
   integration_subnet_id = module.network.integration_subnet_id
-  depends_on            = [module.network]
+  storage_account_name  = module.storage.storage_account_name
+  storage_account_key   = module.storage.storage_primary_access_key
+  storage_share_name    = module.storage.storage_file_share_name
+
+  depends_on = [module.network]
 }
 
 # Key Vault module 

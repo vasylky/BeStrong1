@@ -32,3 +32,23 @@ variable "integration_subnet_id" {
   description = "ID of the subnet for VNet integration"
   type        = string
 }
+
+
+variable "storage_account_name" {
+  description = "Назва Storage Account для монтування"
+  type        = string
+  default     = ""
+}
+
+variable "storage_account_key" {
+  description = "Ключ доступу до Storage Account"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "storage_share_name" {
+  description = "Назва File Share для монтування"
+  type        = string
+  default     = "appfiles"
+}
