@@ -27,5 +27,4 @@ resource "azurerm_subnet" "private_endpoints_subnet" {
   resource_group_name               = var.resource_group_name
   virtual_network_name              = azurerm_virtual_network.vnet.name
   address_prefixes                  = var.pe_subnet_prefix
-  private_endpoint_network_policies_enabled = false
 }
