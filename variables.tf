@@ -105,3 +105,17 @@ variable "sql_db_sku" {
   type        = string
   default     = "S1"
 }
+
+
+variable "tenant_id" {
+  description = "tenant_id"
+  
+}
+
+variable "client_secret" {
+  description = "client secret"
+}
+
+variable "client_id" {
+  description = "client id"
+}
