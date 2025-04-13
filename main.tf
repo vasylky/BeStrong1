@@ -1,6 +1,6 @@
-# terraform {
-#  backend "azurerm" {}
-# }
+terraform {
+ backend "azurerm" {}
+}
 
 provider "azurerm" {
   features {}
@@ -13,10 +13,6 @@ resource "random_id" "suffix" {
   byte_length = 4
 }
 
-resource "azurerm_resource_group" "name" {
-  name     = var.resource_group_name
-  location = var.location
-}
 
 data "azurerm_client_config" "current" {}
 
