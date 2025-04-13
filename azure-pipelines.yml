@@ -1,51 +1,97 @@
 trigger:
-  branches:
-    include:
-      - main
+  - main
 
 pr:
-  branches:
-    include:
-      - main
+  - main
 
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-  - task: TerraformInstaller@0
-    displayName: 'Install Terraform'
-    inputs:
-      terraformVersion: 'latest'
-
-  - task: TerraformCLI@0
-    displayName: 'Terraform Init'
-    inputs:
-      command: 'init'
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-      backendType: 'azurerm'
-      backendServiceArm: 'BeStrong-ServiceConnection'
-      commandOptions: '-backend-config=backend.config'
-
-  - task: TerraformCLI@0
-    displayName: 'Terraform Validate'
-    inputs:
-      command: 'validate'
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-
-  - task: TerraformCLI@0
-    displayName: 'Terraform Plan (PR only)'
-    condition: eq(variables['Build.Reason'], 'PullRequest')
-    inputs:
-      command: 'plan'
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-      environmentServiceName: 'BeStrong-ServiceConnection'
-      publishPlanResults: 'BeStrong-Plan'
-
-  - task: TerraformCLI@0
-    displayName: 'Terraform Apply (main branch only)'
+stages:
+  - stage: Validate
+    jobs:
+      - job: ValidateTerraform
+        steps:
+          # Завантаження tfvars
+          - task: DownloadSecureFile@1
+            name: downloadTfvars
+            inputs:
+              secureFile: 'terraform.tfvars'
+          
+          # Завантаження backend.config
+          - task: DownloadSecureFile@1
+            name: downloadBackend
+            inputs:
+              secureFile: 'backend.config'
+          
+          # Встановлення Terraform
+          - task: TerraformInstaller@0
+            inputs:
+              terraformVersion: 'latest'
+          
+          # Ініціалізація з бекендом
+          - task: AzureCLI@2
+            displayName: 'Terraform Init'
+            inputs:
+              azureSubscription: 'bestrong-conn'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                terraform init -backend-config="$(downloadBackend.secureFilePath)"
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+          
+          # Валідація
+          - script: terraform validate
+            displayName: 'Terraform Validate'
+            workingDirectory: '$(System.DefaultWorkingDirectory)'
+          
+          # План (виконується завжди - і для PR, і для main)
+          - task: AzureCLI@2
+            displayName: 'Terraform Plan'
+            inputs:
+              azureSubscription: 'bestrong-conn'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                terraform plan -var-file="$(downloadTfvars.secureFilePath)"
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+  
+  - stage: Apply
+    dependsOn: Validate
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-    inputs:
-      command: 'apply'
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-      environmentServiceName: 'BeStrong-ServiceConnection'
-      commandOptions: '-auto-approve'
+    jobs:
+      - job: ApplyTerraform
+        steps:
+          - task: DownloadSecureFile@1
+            name: downloadTfvars
+            inputs:
+              secureFile: 'terraform.tfvars'
+          
+          - task: DownloadSecureFile@1
+            name: downloadBackend
+            inputs:
+              secureFile: 'backend.config'
+          
+          - task: TerraformInstaller@0
+            inputs:
+              terraformVersion: 'latest'
+          
+          - task: AzureCLI@2
+            displayName: 'Terraform Init'
+            inputs:
+              azureSubscription: 'bestrong-conn'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                terraform init -backend-config="$(downloadBackend.secureFilePath)"
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+          
+          - task: AzureCLI@2
+            displayName: 'Terraform Apply'
+            inputs:
+              azureSubscription: 'bestrong-conn'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                terraform apply -auto-approve -var-file="$(downloadTfvars.secureFilePath)"
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
