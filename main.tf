@@ -38,7 +38,7 @@ module "appservice" {
   app_service_sku       = var.app_service_sku
   dotnet_version        = var.dotnet_version
   integration_subnet_id = module.network.integration_subnet_id
-  storage_account_name  = module.storage.storage_account_name
+  storage_account_name  = "stagingtfstate7a0c151c"
   storage_account_key   = module.storage.storage_primary_access_key
   storage_share_name    = module.storage.storage_file_share_name
 
