@@ -18,3 +18,9 @@ resource "azurerm_role_assignment" "app_service_key_vault_access" {
   role_definition_name = "Key Vault Secrets User"
   scope                = azurerm_key_vault.keyvault.id
 }
+
+resource "azurerm_role_assignment" "key_vault_policy_access" {
+  principal_id         = var.app_principal_id
+  role_definition_name = "Key Vault Administrator"
+  scope                = azurerm_key_vault.keyvault.id
+}

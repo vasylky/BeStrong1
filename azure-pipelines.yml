@@ -19,24 +19,20 @@ stages:
     jobs:
       - job: ValidateTerraform
         steps:
-          # Завантаження tfvars
           - task: DownloadSecureFile@1
             name: downloadTfvars
             inputs:
               secureFile: 'terraform.tfvars'
           
-          # Завантаження backend.config
           - task: DownloadSecureFile@1
             name: downloadBackend
             inputs:
               secureFile: 'backend.config'
           
-          # Встановлення Terraform
           - task: TerraformInstaller@0
             inputs:
               terraformVersion: 'latest'
           
-          # Ініціалізація з бекендом
           - task: AzureCLI@2
             displayName: 'Terraform Init'
             inputs:
@@ -47,12 +43,10 @@ stages:
                 terraform init -backend-config="$(downloadBackend.secureFilePath)"
               workingDirectory: '$(System.DefaultWorkingDirectory)'
           
-          # Валідація
           - script: terraform validate
             displayName: 'Terraform Validate'
             workingDirectory: '$(System.DefaultWorkingDirectory)'
           
-          # План (виконується завжди - і для PR, і для main)
           - task: AzureCLI@2
             displayName: 'Terraform Plan'
             inputs:
