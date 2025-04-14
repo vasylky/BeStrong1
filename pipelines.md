@@ -37,6 +37,9 @@
 
 ![Моє фото](./images/alrs1.png)
 
+![Моє фото](./images/kvupdat.png)
+
+
 ![Моє фото](./images/gitcheck.png)
 
 
